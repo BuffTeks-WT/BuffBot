@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-16 md:py-24">
+<div class="max-w-4xl mx-auto px-6 space-y-8">
+<header>
+<h1 class="font-bebas text-5xl">About Benny’s House</h1>
+<p class="mt-4 text-white/80 max-w-prose">Benny’s House is an Amarillo‑homed IT & Web services studio serving the Texas Panhandle and the greater Texas area. We build and run practical systems for small businesses and individuals, and we can operate at enterprise scale when needed.</p>
+</header>
+
+
+<section class="glass rounded-2xl p-6 space-y-4">
+<h2 class="text-xl font-semibold">What we believe</h2>
+<ul class="card-list !pl-0 list-none space-y-2">
+<li class="dot">Local‑first when it makes sense, cloud when it earns the right.</li>
+<li class="dot">Simple, reliable stacks beat flashy complexity.</li>
+<li class="dot">Own your infra where possible; avoid lock‑in.</li>
+</ul>
+</section>
+
+
+<section class="grid md:grid-cols-2 gap-6">
+<article class="card">
+<h3 class="card-title">Service Area</h3>
+<p class="card-body">Based in Amarillo, we happily travel anywhere in the Texas Panhandle — and consult across the greater Texas region. Remote support available.</p>
+</article>
+<article class="card">
+<h3 class="card-title">Stack & Focus</h3>
+<p class="card-body">Proxmox • Windows Server/AD • Linux • Flask/Node • Tailwind • MariaDB • WireGuard • Nginx. We ship secure, maintainable, no‑nonsense solutions.</p>
+</article>
+</section>
+
+
+<section class="glass rounded-2xl p-6">
+<h2 class="text-xl font-semibold">Who we help</h2>
+<p class="card-body">Local shops, offices, and individuals who need dependable systems and clean websites. Need enterprise rigor? We can engage via BrookHaven for larger programs.</p>
+</section>
+
+
+<div class="pt-2">
+<a href="/contact" class="btn-primary">Start a project</a>
+<a href="/services" class="btn-ghost ml-2">Explore services</a>
+</div>
+</div>
+</section>
+{% endblock %}

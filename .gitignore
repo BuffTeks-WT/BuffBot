@@ -1,0 +1,41 @@
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Flask specific
+instance/
+.webassets-cache/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Editor specific files (optional, uncomment if applicable)
+# .vscode/
+# .idea/
+# *.sublime-project
+# *.sublime-workspace
+
+# Database files (if using a local SQLite database)
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+
+# Sensitive files (e.g., environment variables)
+.env

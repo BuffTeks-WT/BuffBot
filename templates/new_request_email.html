@@ -1,0 +1,41 @@
+<!-- Email to Admin: New Request Summary -->
+<table width="100%" cellpadding="0" cellspacing="0" style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:#0f172a; background:#f8fafc; padding:24px;">
+  <tr>
+    <td align="center">
+      <table width="640" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #e5e7eb; border-radius:12px;">
+        <tr>
+          <td style="padding:24px; border-bottom:1px solid #e5e7eb;">
+            <h1 style="margin:0; font-size:20px;">New Quote Request</h1>
+            <p style="margin:4px 0 0; color:#6b7280; font-size:14px;">{{ payload.name }} ({{ payload.email }})</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px;">
+            <h2 style="font-size:16px; margin:0 0 8px;">Project Summary</h2>
+            <ul style="margin:0 0 16px; padding-left:18px; color:#374151; font-size:14px;">
+              <li><strong>Type:</strong> {{ payload.project_type }}</li>
+              <li><strong>Complexity:</strong> {{ payload.complexity }}</li>
+              <li><strong>Urgency:</strong> {{ payload.urgency }}</li>
+              <li><strong>Features:</strong> {{ payload.features|join(', ') if payload.features else 'None' }}</li>
+              <li><strong>Budget:</strong> {{ payload.budget_range or 'n/a' }}</li>
+            </ul>
+
+            <h3 style="font-size:14px; margin:0 0 6px; color:#111827;">Description</h3>
+            <p style="margin:0 0 16px; color:#374151; white-space:pre-line;">{{ payload.description or '—' }}</p>
+
+            <h3 style="font-size:14px; margin:0 0 6px; color:#111827;">Auto-Estimate</h3>
+            <p style="margin:0; color:#111827; font-size:14px;">
+              ~{{ est_hours }} hours @ ${{ '%.2f'|format(hourly_rate) }}/hr → <strong>${{ '%.2f'|format(est_cost) }}</strong>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:16px 24px; background:#f8fafc; border-top:1px solid #e5e7eb; color:#6b7280; font-size:12px;">
+            <a href="{{ base_url }}/admin?p={{ config('ADMIN_DASH_PASSWORD', 'changeme') if false else '' }}" style="color:#2563eb;text-decoration:underline;">Open Admin</a>
+            &nbsp;•&nbsp; <a href="{{ base_url }}/preview-client-email" style="color:#2563eb;text-decoration:underline;">Preview Client Email Template</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>

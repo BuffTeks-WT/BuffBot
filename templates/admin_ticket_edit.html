@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Edit Ticket — {{ brand }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">Edit Ticket #{{ t.id }}</h1>
+<form method="post" class="mt-4 grid gap-3 max-w-2xl">
+  <div>
+    <label class="text-xs text-white/60">Title</label>
+    <input name="title" value="{{ t.title }}" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" required />
+  </div>
+  <div>
+    <label class="text-xs text-white/60">Description</label>
+    <textarea name="description" rows="8" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" required>{{ t.description }}</textarea>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="text-xs text-white/60">Priority</label>
+      <select name="priority" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2">
+        {% for p in ['low','normal','high','urgent'] %}<option value="{{p}}" {{ 'selected' if t.priority==p else '' }}>{{p.title()}}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="text-xs text-white/60">Labels (comma-sep)</label>
+      <input name="labels" value="{{ ', '.join(t.label_list()) }}" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" />
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="text-xs text-white/60">Assignee Discord ID</label>
+      <input name="assignee_id" value="{{ t.assignee_id or '' }}" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" />
+    </div>
+    <div>
+      <label class="text-xs text-white/60">Assignee Display Name</label>
+      <input name="assignee_name" value="{{ t.assignee_name or '' }}" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" />
+    </div>
+  </div>
+  <div>
+    <label class="text-xs text-white/60">Status</label>
+    <select name="status" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2">
+      {% for s in ['open','in_progress','done','cancelled'] %}<option value="{{s}}" {{ 'selected' if t.status==s else '' }}>{{ s.replace('_',' ').title() }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="mt-2"><button class="btn-accent">Save Changes</button></div>
+</form>
+{% endblock %}

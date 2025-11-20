@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Events — {{ brand }}{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-16">
+  <h1 class="text-4xl font-bold">Events</h1>
+  <p class="mt-2 text-white/75">Meetings, workshops, and client check-ins.</p>
+  <div class="mt-8 space-y-4">
+    {% if not events %}
+      <div class="text-white/70">No events yet. Check back soon.</div>
+    {% endif %}
+    {% for e in events %}
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div class="text-lg font-semibold">{{ e.title }}</div>
+      <div class="text-white/80">
+        {{ (e.start_dt or e.start)|string }}{% if e.location %} • {{ e.location }}{% endif %}
+      </div>
+      {% if e.desc %}<p class="mt-2 text-white/75">{{ e.desc }}</p>{% endif %}
+      {% if e.rsvp %}<a href="{{ e.rsvp }}" class="inline-block mt-3 underline hover:text-bt-accent">RSVP</a>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Join — {{ brand }}{% endblock %}
+{% block content %}
+<section class="max-w-3xl mx-auto px-6 py-16">
+  <h1 class="text-4xl font-bold">Join BuffTEKS</h1>
+  <p class="mt-2 text-white/75">Tell us a bit about you and what you want to build.</p>
+
+  <form method="post" class="mt-8 space-y-4 rounded-2xl bg-white/5 border border-white/10 p-6">
+    <div>
+      <label class="block text-sm text-white/70">Name</label>
+      <input name="name" required class="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-bt-accent/60">
+    </div>
+    <div>
+      <label class="block text-sm text-white/70">Email</label>
+      <input type="email" name="email" required class="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-bt-accent/60">
+    </div>
+    <div>
+      <label class="block text-sm text-white/70">What are you interested in?</label>
+      <textarea name="interest" rows="4" class="mt-1 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-bt-accent/60" placeholder="Web, data, app dev, events…"></textarea>
+    </div>
+    <button class="px-5 py-3 rounded-xl bg-bt-accent/90 text-black font-semibold shadow-glow">Submit</button>
+  </form>
+
+  <div class="mt-8 text-white/70 text-sm">
+    Prefer Discord or email? Drop a line: <span class="underline">contact@buffteks.org</span>
+  </div>
+</section>
+{% endblock %}
+

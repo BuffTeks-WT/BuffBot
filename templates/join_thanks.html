@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Thanks — {{ brand }}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto card p-6 text-center">
+  <h1 class="text-2xl font-bold">Thanks!</h1>
+  <p class="text-white/70 mt-1">Your request has been submitted. A BuffTEKS officer will contact you soon.</p>
+  <div class="mt-4">
+    <a href="{{ url_for('tickets') }}" class="btn">Back to Home</a>
+  </div>
+</div>
+{% endblock %}

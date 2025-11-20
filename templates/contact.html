@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-16 md:py-24">
+<div class="max-w-4xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-start">
+<div>
+<h1 class="font-bebas text-5xl">Contact</h1>
+<div class="mt-6 glass rounded-2xl p-6 space-y-2">
+<div class="text-xl font-semibold">{{ contact.name }}</div>
+<div class="text-white/70">{{ contact.title }}</div>
+<div class="text-white/80">{{ contact.city }}</div>
+<div class="text-white/80">Hours: {{ contact.hours }}</div>
+<div class="pt-4 flex flex-col gap-2 text-sm">
+<a class="link" href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+<a class="link" href="tel:{{ contact.phone }}">{{ contact.phone }}</a>
+<a class="link" href="{{ contact.cal }}">Book a call</a>
+<a class="link" href="/benjamin.vcf">Download vCard</a>
+<a class="link" href="{{ contact.link }}">LinkedIn</a>
+</div>
+</div>
+</div>
+
+
+<form action="https://formspree.io/f/your-id" method="POST" class="glass rounded-2xl p-6 space-y-4">
+<div>
+<label class="label">Name</label>
+<input required name="name" class="input" placeholder="Jane Doe" />
+</div>
+<div>
+<label class="label">Email</label>
+<input required name="email" type="email" class="input" placeholder="you@company.com" />
+</div>
+<div>
+<label class="label">What do you need?</label>
+<textarea required name="message" rows="6" class="textarea" placeholder="Briefly describe your project..."></textarea>
+</div>
+<button class="btn-primary w-full">Send</button>
+<p class="text-xs text-white/50">By sending, you consent to be contacted about this request.</p>
+</form>
+</div>
+</section>
+{% endblock %}

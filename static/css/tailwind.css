@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* --- Design tokens (light/dark) --- */
+@layer base {
+  :root {
+    --bg: 10 10 10;
+    --fg: 245 245 245;
+    --muted: 165 165 165;
+    --accent: 249 115 22; /* orange-500 */
+    --border: 38 38 38;
+    --card: 18 18 18;
+  }
+  :root[data-theme="light"] {
+    --bg: 255 255 255;
+    --fg: 17 17 17;
+    --muted: 115 115 115;
+    --accent: 234 88 12; /* orange-600 */
+    --border: 229 231 235;
+    --card: 250 250 250;
+  }
+
+  html, body { height: 100%; }
+  body { background: rgb(var(--bg)); color: rgb(var(--fg)); }
+}
+
+/* --- Component classes --- */
+@layer components {
+  .container-page { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+  .btn { @apply inline-flex items-center gap-2 rounded-xl px-4 py-2 font-medium border transition; }
+  .btn-primary { @apply border-transparent bg-[rgb(var(--accent))] text-white hover:opacity-90; }
+  .btn-ghost { @apply border-[rgb(var(--border))] bg-transparent text-[rgb(var(--fg))] hover:bg-[rgb(var(--card))]; }
+  .card { @apply rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-6 shadow; }
+  .heading-hero { @apply font-extrabold tracking-tight text-4xl sm:text-6xl; }
+  .subtle { color: rgb(var(--muted)); }
+  .nav-link { @apply text-sm text-[rgb(var(--muted))] hover:text-[rgb(var(--fg))] transition; }
+}
+
+/* --- Pretty shadow --- */
+@layer utilities {
+  .shadow-glass { box-shadow: 0 8px 30px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.06); }
+}
+

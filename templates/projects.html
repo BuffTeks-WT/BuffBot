@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Projects — {{ brand }}{% endblock %}
+{% block content %}
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <h1 class="text-4xl font-bold">Projects</h1>
+  <p class="mt-2 text-white/75">A rotating sample of what members ship.</p>
+  <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for p in projects %}
+    <article class="rounded-2xl bg-white/5 border border-white/10 p-5">
+      <h3 class="text-xl font-semibold">{{ p.title }}</h3>
+      <p class="mt-2 text-white/80">{{ p.blurb }}</p>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {% for tag in p.tags %}<span class="text-xs px-2 py-1 rounded bg-white/10 border border-white/10">{{ tag }}</span>{% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+

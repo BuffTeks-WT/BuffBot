@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="py-16 md:py-24">
+<div class="max-w-6xl mx-auto px-6">
+<header class="max-w-3xl">
+<h1 class="font-bebas text-5xl">Services</h1>
+<p class="mt-4 text-white/80">From local sysadmin to modern web, we tailor the stack to your constraints and budget — including refurb‑powered discounts to keep costs sensible.</p>
+</header>
+
+
+<div class="mt-10 grid md:grid-cols-2 gap-6">
+<article class="card">
+<h3 class="card-title">Local System Administration</h3>
+<p class="card-body">On‑site/remote support for small businesses and individuals. Proxmox clusters, Windows Server/Active Directory, Linux, backups, VLANs, DNS, VPN, and monitoring.</p>
+<ul class="card-list">
+<li>User & identity management (AD)</li>
+<li>Secure file servers (Samba/NFS)</li>
+<li>Automated backups & recovery drills</li>
+</ul>
+</article>
+
+
+<article class="card">
+<h3 class="card-title">Web Development & Hosting</h3>
+<p class="card-body">Flask/Node apps or static sites with Tailwind front‑ends. SSL, backups, staging, wildcard subdomains — and Stripe/domain upsells when you’re ready.</p>
+<ul class="card-list">
+<li>New builds or refactors</li>
+<li>Observability baked in</li>
+<li>Fast, accessible UI</li>
+</ul>
+</article>
+
+
+<article class="card">
+<h3 class="card-title">App Deployment & Integrations</h3>
+<p class="card-body">Want a custom Obsidian server for your office? Need a self‑hosted wiki, dashboard, or existing tool stood up securely? We handle the infra, auth, and logistics.</p>
+<ul class="card-list">
+<li>Install, configure, and harden</li>
+<li>Single‑sign‑on options</li>
+<li>Backups & updates scheduled</li>
+</ul>
+</article>
+
+
+<article class="card">
+<h3 class="card-title">Refurb & Recycle Discounts</h3>
+<p class="card-body">Lower your quote by letting us refurb quality used hardware into dependable local servers. Burn‑in tests and warranty options included.</p>
+<ul class="card-list">
+<li>Cost‑effective nodes</li>
+<li>Green and budget‑friendly</li>
+<li>On‑site support options</li>
+</ul>
+</article>
+
+
+<article class="card md:col-span-2">
+<h3 class="card-title">Enterprise via BrookHaven</h3>
+<p class="card-body">If you need larger‑scale rollouts, compliance, or cross‑site coordination, we can deliver through our enterprise channel (BrookHaven) while keeping execution pragmatic.</p>
+<div class="mt-4">
+<a href="/contact" class="btn-primary">Tell us what you need</a>
+<a href="/about" class="btn-ghost ml-2">Learn about us</a>
+</div>
+</article>
+</div>
+</div>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Fonts (host locally if you want; leaving CSS hooks here) */
+@layer base {
+:root {
+--bg: #0a0a0a;
+}
+html, body { background: var(--bg); }
+.font-bebas { font-family: "Bebas Neue", ui-sans-serif, system-ui; }
+}
+
+
+/* Utilities */
+@layer utilities {
+.bg-grid {
+background-image:
+linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px);
+background-size: 48px 48px;
+background-position: -1px -1px;
+}
+.mask-fade { -webkit-mask-image: linear-gradient(to bottom, black, rgba(0,0,0,.85) 40%, transparent 80%); mask-image: linear-gradient(to bottom, black, rgba(0,0,0,.85) 40%, transparent 80%); }
+.glass { backdrop-filter: blur(12px); background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+.dot { display: inline-flex; align-items: center; gap: .5rem; }
+.dot::before { content: ""; width: .5rem; height: .5rem; border-radius: 9999px; background: rgb(52 211 153); }
+}
+
+
+/* Components */
+@layer components {
+.btn-primary { @apply inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white text-black font-semibold hover:opacity-90 transition; }
+.btn-ghost { @apply inline-flex items-center justify-center px-5 py-3 rounded-xl glass font-semibold hover:bg-white/10 transition; }
+.label { @apply text-sm text-white/70; }
+.input { @apply w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/30; }
+.textarea { @apply w-full mt-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-white/30; }
+.link { @apply underline underline-offset-4 hover:no-underline; }
+.card { @apply glass rounded-2xl p-6; }
+.card-title { @apply font-semibold text-lg; }
+.card-body { @apply mt-2 text-sm text-white/80; }
+.card-list { @apply mt-4 space-y-2 text-sm text-white/70 list-disc pl-4; }
+}

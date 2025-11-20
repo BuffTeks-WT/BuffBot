@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}New Ticket — {{ brand }}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">Create Ticket</h1>
+<form method="post" class="mt-4 grid gap-3 max-w-2xl">
+  <div>
+    <label class="text-xs text-white/60">Title</label>
+    <input name="title" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" required />
+  </div>
+  <div>
+    <label class="text-xs text-white/60">Description</label>
+    <textarea name="description" rows="8" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" required></textarea>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="text-xs text-white/60">Priority</label>
+      <select name="priority" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2">
+        {% for p in ['low','normal','high','urgent'] %}<option value="{{p}}">{{p.title()}}</option>{% endfor %}
+      </select>
+    </div>
+    <div>
+      <label class="text-xs text-white/60">Labels (comma-sep)</label>
+      <input name="labels" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" placeholder="frontend, bug, outreach" />
+    </div>
+  </div>
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="text-xs text-white/60">Assignee Discord ID (optional)</label>
+      <input name="assignee_id" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" />
+    </div>
+    <div>
+      <label class="text-xs text-white/60">Assignee Display Name (optional)</label>
+      <input name="assignee_name" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2" />
+    </div>
+  </div>
+  <div class="mt-2"><button class="btn-accent">Create Ticket</button></div>
+</form>
+{% endblock %}

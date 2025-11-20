@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 [background:radial-gradient(600px_circle_at_20%_20%,rgba(138,43,226,.12),transparent_60%),radial-gradient(400px_circle_at_80%_0%,rgba(59,130,246,.10),transparent_60%)]"></div>
+  <div class="relative max-w-7xl mx-auto px-6 py-20 sm:py-28">
+    <div class="max-w-3xl">
+      <h1 class="font-display tracking-wide text-5xl sm:text-7xl leading-[0.95]">
+        {{ brand }}<span class="text-bt-accent"> builds</span> for the community.
+      </h1>
+      <p class="mt-6 text-lg text-white/80 max-w-2xl">
+        {{ tagline }} From websites and dashboards to event tech and client projects, we learn by shipping.
+      </p>
+
+      {% if next_event %}
+      <div class="mt-8 rounded-2xl border border-bt-accent/30 bg-bt-accent/10 p-4 sm:p-5">
+        <div class="text-sm uppercase tracking-wide text-white/70">Next meeting</div>
+        <div class="mt-1 text-xl font-semibold">
+          {{ next_event.title }}
+        </div>
+        <div class="text-white/80">
+          {{ next_event.start_dt.strftime('%a, %b %d @ %I:%M %p') }} • {{ next_event.location }}
+        </div>
+        {% if next_event.rsvp %}<a class="inline-block mt-3 underline hover:text-bt-accent" href="{{ next_event.rsvp }}">RSVP</a>{% endif %}
+      </div>
+      {% endif %}
+
+      <div class="mt-10 flex gap-4">
+        <a href="{{ url_for('join') }}" class="px-5 py-3 rounded-xl bg-bt-accent/90 text-black font-semibold shadow-glow">Join BuffTEKS</a>
+        <a href="{{ url_for('projects') }}" class="px-5 py-3 rounded-xl border border-white/20 hover:border-white/40">See projects</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-6">
+  {% for blurb in [
+    {'t':'Real Clients','d':'Local orgs + campus teams. Small scope, real stakes.'},
+    {'t':'Hands-on Learning','d':'Version control, reviews, deployments, docs.'},
+    {'t':'Open Source','d':'We default to public repos and reusable templates.'}
+  ] %}
+    <div class="rounded-2xl bg-white/5 border border-white/10 p-6">
+      <h3 class="text-xl font-semibold">{{ blurb.t }}</h3>
+      <p class="mt-2 text-white/75">{{ blurb.d }}</p>
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}
+

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}{{ brand }}{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('favicon') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --bt-accent: {{ accent|default('#9b5cf6') }}; }
+    .nav-link { @apply text-white/80 text-sm font-medium px-3 py-2 rounded-lg transition hover:text-white hover:bg-white/10; }
+    .nav-cta  { @apply font-semibold text-black px-3 py-2 rounded-lg; background: var(--bt-accent); }
+    .nav-cta:hover { filter: brightness(0.95); }
+    .nav-active { @apply text-white bg-white/10; }
+  </style>
+</head>
+<body class="bg-[#080812] text-white min-h-screen flex flex-col">
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a15]/80 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 md:px-6">
+      <!-- increased height + breathing room -->
+      <div class="h-16 flex items-center justify-between gap-4">
+        <!-- Brand -->
+        <a href="{{ url_for('tickets') }}" class="shrink-0 text-lg md:text-xl font-bold tracking-tight flex items-center gap-1">
+          <span>Buff</span><span style="color:var(--bt-accent)">TEKS</span>
+        </a>
+
+        {% set u = session.get('discord_user') %}
+        <!-- Desktop nav -->
+        <nav class="hidden md:flex items-center gap-3">
+          <a href="{{ url_for('tickets') }}" class="nav-link {% if request.endpoint == 'tickets' %}nav-active{% endif %}">Tickets</a>
+          {% if u and 'admin' in (u.get('site_roles') or []) %}
+            <a href="{{ url_for('admin_new_ticket') }}" class="nav-link {% if request.endpoint == 'admin_new_ticket' %}nav-active{% endif %}">New Ticket</a>
+          {% endif %}
+
+          <!-- visual divider before auth area -->
+          <span class="h-6 w-px bg-white/10 mx-1"></span>
+
+          {% if u %}
+            <span class="text-white/60 text-sm px-1 md:px-2">Signed in as <b class="font-semibold" style="color:var(--bt-accent)">{{ u.username }}</b></span>
+            <a href="{{ url_for('logout') }}" class="nav-link">Log out</a>
+          {% else %}
+            <a href="{{ url_for('discord_login') }}" class="nav-cta">Sign in</a>
+          {% endif %}
+        </nav>
+
+        <!-- Mobile hamburger (force visible) -->
+        <button id="navToggle" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/20" aria-label="Toggle menu" aria-expanded="false">
+          <!-- use stroked paths so they pop on dark bg -->
+          <svg id="iconOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="iconClose" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-white/10 bg-[#0b0b17]/95 shadow-2xl">
+      <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 flex flex-col gap-2">
+        <a href="{{ url_for('tickets') }}" class="nav-link {% if request.endpoint == 'tickets' %}nav-active{% endif %}">Tickets</a>
+        {% if u and 'admin' in (u.get('site_roles') or []) %}
+          <a href="{{ url_for('admin_new_ticket') }}" class="nav-link {% if request.endpoint == 'admin_new_ticket' %}nav-active{% endif %}">New Ticket</a>
+        {% endif %}
+        <span class="h-px bg-white/10 my-1"></span>
+        {% if u %}
+          <div class="px-3 text-sm text-white/60">Signed in as <b class="text-white">{{ u.username }}</b></div>
+          <a href="{{ url_for('logout') }}" class="nav-link">Log out</a>
+        {% else %}
+          <a href="{{ url_for('discord_login') }}" class="nav-cta w-fit">Sign in</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN (added a touch more top padding so content isn't crowded) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="text-center py-6 text-white/40 text-sm border-t border-white/10">
+    &copy; {{ brand }} · Built in-house by student engineers
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const menu = document.getElementById('mobileMenu');
+    const openIcon = document.getElementById('iconOpen');
+    const closeIcon = document.getElementById('iconClose');
+    toggle?.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', (!expanded).toString());
+      openIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

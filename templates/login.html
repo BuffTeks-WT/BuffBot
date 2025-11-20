@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="min-h-[60vh] grid place-items-center">
+  <div class="w-full max-w-md card glass p-8">
+    <h1 class="text-2xl font-bold mb-2">Admin Sign In</h1>
+    <p class="text-white/70 mb-6 text-sm">Enter your credentials to access the dashboard.</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="space-y-2 mb-4">
+          {% for category, msg in messages %}
+            <div class="p-3 rounded border {{ 'border-red-400 text-red-300' if category=='error' else 'border-green-400 text-green-300' }}">{{ msg }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('admin_login') }}" class="space-y-4">
+      <input type="hidden" name="_csrf" value="{{ csrf }}">
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div>
+        <label for="username">Username</label>
+        <input id="username" name="username" required type="text" class="w-full mt-1" placeholder="admin" autocomplete="username">
+      </div>
+
+      <div>
+        <label for="password">Password</label>
+        <input id="password" name="password" required type="password" class="w-full mt-1" placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-white/80">
+        <input type="checkbox" name="remember">
+        <span>Remember me for 30 days</span>
+      </label>
+
+      <button class="btn bg-accent font-semibold w-full" type="submit">Sign in</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+

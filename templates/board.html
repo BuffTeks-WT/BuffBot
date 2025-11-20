@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Message Board — {{ brand }}{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-10">
+  <!-- Header -->
+  <header class="flex items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold">Message Board</h1>
+      <p class="text-white/70 text-sm">Mirror of the Discord channel.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      {% if user %}
+        <span class="text-white/80 text-sm">Signed in as <strong>{{ user.username }}</strong></span>
+        <a href="{{ url_for('logout') }}" class="px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-sm">Log out</a>
+      {% else %}
+        <a href="{{ url_for('discord_login') }}" class="px-3 py-1.5 rounded-lg bg-bt-accent/90 text-black font-semibold">Sign in with Discord</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Composer (Admins only) -->
+  <div class="mt-6 rounded-2xl bg-white/5 border border-white/10 p-4">
+    <textarea
+      id="composer" rows="3" placeholder="Share an update…"
+      class="w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-bt-accent/60"
+      {% if not can_post %}disabled aria-disabled="true"{% endif %}
+      {% if not user %}title="Sign in to post"{% elif not can_post %}title="Admins only"{% endif %}></textarea>
+
+    <div class="mt-3 flex items-center justify-between">
+      <div class="text-white/60 text-xs">
+        {% if not user %}Sign in to post.{% elif not can_post %}You don’t have permission to post.{% endif %}
+      </div>
+      <button
+        id="sendBtn"
+        class="px-4 py-2 rounded-xl bg-bt-accent/90 text-black font-semibold shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+        {% if not can_post %}disabled aria-disabled="true"{% endif %}>
+        Post
+      </button>
+    </div>
+  </div>
+
+  <!-- Member Status (Members & Admins) -->
+  {% if user %}
+  <div class="mt-4 rounded-2xl bg-white/5 border border-white/10 p-4">
+    <div class="flex items-center justify-between">
+      <h2 class="font-semibold">Your Status</h2>
+      <span class="text-xs text-white/60">Visible in Discord via webhook</span>
+    </div>
+    <textarea
+      id="statusBox" rows="2" maxlength="140" placeholder="What are you working on? (max 140)"
+      class="mt-2 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2 outline-none focus:ring-2 focus:ring-bt-accent/60"></textarea>
+    <div class="mt-3 flex items-center justify-between">
+      <div class="text-white/60 text-xs"><span id="statusCount">0</span>/140</div>
+      <button
+        id="statusBtn"
+        class="px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-sm">
+        Update Status
+      </button>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Messages -->
+  <div id="board" class="mt-6 space-y-3">
+    {% for m in messages %}
+    <article class="rounded-2xl bg-white/5 border border-white/10 p-4">
+      <div class="flex items-start gap-3">
+        {% if m.avatar %}
+          <img src="{{ m.avatar }}" alt="" class="size-9 rounded-lg">
+        {% else %}
+          <div class="size-9 rounded-lg bg-white/10 grid place-items-center" aria-hidden="true">🟣</div>
+        {% endif %}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <div class="font-semibold">{{ m.username }}</div>
+            {% if m.timestamp %}
+              <div class="text-xs text-white/50">{{ m.timestamp | replace('T',' ') | replace('Z',' UTC') }}</div>
+            {% endif %}
+          </div>
+          <div class="mt-1 whitespace-pre-wrap text-white/90">{{ m.content }}</div>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="mt-6 text-center">
+    <button id="refreshBtn" class="px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-sm">Refresh</button>
+  </div>
+</section>
+
+<script>
+const board = document.getElementById('board');
+const sendBtn = document.getElementById('sendBtn');
+const composer = document.getElementById('composer');
+const refreshBtn = document.getElementById('refreshBtn');
+const statusBox = document.getElementById('statusBox');
+const statusBtn = document.getElementById('statusBtn');
+const statusCount = document.getElementById('statusCount');
+
+function escapeHtml(s){
+  return (s||'')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;');
+}
+
+async function fetchMessages(){
+  const r = await fetch('/api/board/messages');
+  if(!r.ok) return;
+  const data = await r.json();
+  board.innerHTML = data.map(m => `
+    <article class="rounded-2xl bg-white/5 border border-white/10 p-4">
+      <div class="flex items-start gap-3">
+        ${m.avatar ? `<img src="${m.avatar}" class="size-9 rounded-lg" alt="">`
+                    : `<div class="size-9 rounded-lg bg-white/10 grid place-items-center" aria-hidden="true">🟣</div>`}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <div class="font-semibold">${escapeHtml(m.username)}</div>
+            ${m.timestamp ? `<div class="text-xs text-white/50">${escapeHtml(m.timestamp.replace('T',' ').replace('Z',' UTC'))}</div>` : ``}
+          </div>
+          <div class="mt-1 whitespace-pre-wrap text-white/90">${escapeHtml(m.content)}</div>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+async function postMessage(){
+  if (!sendBtn || sendBtn.hasAttribute('disabled')) return; // guard for non-admins
+  const content = composer.value.trim();
+  if(!content) return;
+  const r = await fetch('/api/board/post', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({content})
+  });
+  if(r.ok){
+    composer.value='';
+    fetchMessages();
+  }else{
+    const e = await r.json().catch(()=>({error:'Failed'}));
+    alert(e.error || 'Failed to post');
+  }
+}
+
+async function updateStatus(){
+  if (!statusBtn) return;
+  const status = statusBox.value.trim();
+  if(!status) return;
+  const r = await fetch('/api/me/status', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({status})
+  });
+  if(r.ok){
+    statusBox.value='';
+    if(statusCount) statusCount.textContent = '0';
+    alert('Status updated!');
+  }else{
+    const e = await r.json().catch(()=>({error:'Failed'}));
+    alert(e.error || 'Failed to update status');
+  }
+}
+
+sendBtn?.addEventListener('click', postMessage);
+refreshBtn?.addEventListener('click', fetchMessages);
+statusBtn?.addEventListener('click', updateStatus);
+statusBox?.addEventListener('input', () => {
+  if(statusCount) statusCount.textContent = String(statusBox.value.length);
+});
+
+// initial + polling
+fetchMessages();
+setInterval(fetchMessages, 15000);
+</script>
+{% endblock %}
+
