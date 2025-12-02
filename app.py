@@ -4,11 +4,16 @@
 # Non-members are redirected to /join (VIP portal) after Discord login.
 # ─────────────────────────────────────────────────────────────────────────────
 from __future__ import annotations
-import os, json, time, requests
+import os, time, requests
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
-
+import json as _json
+import hmac
+import hashlib
+from flask_wtf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask import (
     Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort
 )
@@ -27,6 +32,13 @@ app = Flask(
 )
 app.secret_key = os.environ.get("APP_SECRET_KEY", "dev")
 
+csrf = CSRFProtect(app)
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+)
+
 # Branding
 BRAND   = os.environ.get("SITE_BRAND", "BuffTEKS")
 TAGLINE = os.environ.get("SITE_TAGLINE", "Student Engineers. Real Projects. Community Impact.")
@@ -42,6 +54,8 @@ DISCORD_CLIENT_ID     = os.environ.get("DISCORD_CLIENT_ID", "")
 DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "")
 OAUTH_REDIRECT_URI    = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:5000/auth/discord/callback")
 
+
+
 # Roles
 ADMIN_ROLE_IDS   = {r.strip() for r in os.environ.get("ADMIN_ROLE_IDS", "").split(",") if r.strip()}
 MEMBER_ROLE_IDS  = {r.strip() for r in os.environ.get("MEMBER_ROLE_IDS", "").split(",") if r.strip()}
@@ -54,6 +68,16 @@ DB_URL = os.environ.get('DATABASE_URL', f'sqlite:///{DEFAULT_SQLITE_PATH}')
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+
+def getenv(name: str, default: Optional[str] = None):
+    return os.environ.get(name, default)
+
+# NOW load env-based configuration
+REPO_EVENT_CHANNEL_MAP = _json.loads(getenv("REPO_EVENT_CHANNEL_MAP", "{}"))
+GITHUB_WEBHOOK_SECRET = getenv("GITHUB_WEBHOOK_SECRET", "")
+DEFAULT_DISCORD_WEBHOOK = getenv("DISCORD_WEBHOOK_URL", "")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Models
@@ -267,6 +291,7 @@ SAFE_ENDPOINTS = {
     "join",
     "join_thanks",
     "favicon",
+    "github_webhook",
 }
 
 @app.before_request
@@ -746,6 +771,109 @@ def favicon():
 def init_db():
     with app.app_context():
         db.create_all()
+
+
+@app.post("/webhooks/github")
+@csrf.exempt
+@limiter.exempt
+def github_webhook():
+    event = request.headers.get("X-GitHub-Event")
+    payload = request.get_json(silent=True) or {}
+
+    # Identify repo
+    repo = payload.get("repository", {}).get("full_name")
+    if not repo:
+        return jsonify({"ok": False, "error": "No repository info"}), 400
+
+    # Look up channel mapping for this repo
+    repo_cfg = REPO_EVENT_CHANNEL_MAP.get(repo, {})
+
+    # Look up webhook for this specific event
+    webhook = repo_cfg.get(event)
+    if not webhook:
+        # No configured channel for this event → ignore safely
+        return jsonify({
+            "ok": True,
+            "note": f"No channel configured for event `{event}` on repo `{repo}`"
+        }), 200
+
+    # Format message
+    message = format_github_event(event, payload)
+
+    # Send to Discord
+    discord_webhook_send(webhook, message)
+
+    return jsonify({"ok": True}), 200
+
+
+def format_github_event(event: str, p: dict) -> str:
+    repo = p.get("repository", {}).get("full_name", "Unknown Repo")
+
+    if event == "push":
+        pusher = p.get("pusher", {}).get("name")
+        commits = p.get("commits", [])
+        commit_lines = "\n".join(
+            f"- `{c.get('id','')[:7]}` {c.get('message','').strip()} — {c.get('author',{}).get('name','')}"
+            for c in commits
+        )
+        return (
+            f"📦 **Push to `{repo}`** by **{pusher}**\n"
+            f"{commit_lines or '(no commit messages)'}"
+        )
+
+    if event == "issues":
+        action = p.get("action")
+        issue = p.get("issue", {})
+        return (
+            f"🐛 **Issue {action} — #{issue.get('number')}**\n"
+            f"**{issue.get('title')}**\n"
+            f"{issue.get('html_url')}"
+        )
+
+    if event == "pull_request":
+        action = p.get("action")
+        pr = p.get("pull_request", {})
+        return (
+            f"🔀 **PR {action} — #{pr.get('number')}**\n"
+            f"**{pr.get('title')}**\n"
+            f"{pr.get('html_url')}"
+        )
+
+    if event == "release":
+        r = p.get("release", {})
+        return (
+            f"🚀 **New Release `{r.get('tag_name')}`**\n"
+            f"**{r.get('name')}**\n"
+            f"{r.get('html_url')}"
+        )
+
+    # Fallback
+    return f"ℹ️ Event `{event}` received from `{repo}`"
+
+
+def discord_webhook_send(url: str, content: str):
+    if not url:
+        return
+    try:
+        requests.post(url, json={"content": content[:1900]}, timeout=10)
+    except Exception as e:
+        print("Discord webhook error:", e)
+
+
+def send_discord(msg: str, repo: str):
+    # Decide channel (repo-specific or fallback)
+    webhook = REPO_CHANNEL_MAP.get(repo, DEFAULT_DISCORD_WEBHOOK)
+    if not webhook:
+        print(f"No webhook for repo {repo}")
+        return
+
+    try:
+        requests.post(webhook, json={"content": msg})
+    except Exception as e:
+        print("Discord error:", e)
+
+
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Templates (written at import-time so Gunicorn has them)
