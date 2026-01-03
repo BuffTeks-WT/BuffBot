@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · {{ brand }}{% endblock %}
+
+{% block content %}
+<section class="space-y-8">
+
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
+        GitHub Dashboard
+      </h1>
+      <p class="text-white/60 mt-1">
+        Live view of active BuffTEKS projects
+      </p>
+    </div>
+
+  </header>
+
+  <!-- Main Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+
+    <!-- LEFT: Repo Grid -->
+    <div class="grid grid-cols-1 gap-6">
+      {% for repo, data in repos.items() %}
+      <article class="rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition shadow-lg">
+
+        <!-- Repo Header -->
+        <div class="p-5 border-b border-white/10 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-semibold tracking-tight">
+              {{ repo.split('/')[-1] }}
+            </h2>
+            <p class="text-sm text-white/50">
+              {{ repo }}
+            </p>
+          </div>
+
+          <a href="https://github.com/{{ repo }}"
+             target="_blank"
+             class="text-sm px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+            Open Repo →
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 gap-4 p-5 border-b border-white/10">
+          <div class="rounded-xl bg-black/30 p-4">
+            <div class="text-sm text-white/50">Open Issues</div>
+            <div class="text-2xl font-bold mt-1">
+              {{ data.issues|length }}
+            </div>
+          </div>
+          <div class="rounded-xl bg-black/30 p-4">
+            <div class="text-sm text-white/50">Open PRs</div>
+            <div class="text-2xl font-bold mt-1">
+              {{ data.prs|length }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Issues -->
+        <div class="p-5">
+          <h3 class="text-sm uppercase tracking-wide text-white/50 mb-2">
+            Issues
+          </h3>
+
+          {% if data.issues %}
+          <ul class="space-y-2">
+            {% for i in data.issues[:5] %}
+            <li>
+              <a href="{{ i.html_url }}"
+                 target="_blank"
+                 class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-black/30 hover:bg-black/50 transition">
+                <span class="truncate">
+                  <span class="text-white/40 mr-2">#{{ i.number }}</span>
+                  {{ i.title }}
+                </span>
+                <span class="text-xs text-white/40">Issue</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="text-sm text-white/40 italic">
+            No open issues 🎉
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- PRs -->
+        <div class="p-5 pt-0">
+          <h3 class="text-sm uppercase tracking-wide text-white/50 mb-2">
+            Pull Requests
+          </h3>
+
+          {% if data.prs %}
+          <ul class="space-y-2">
+            {% for p in data.prs[:5] %}
+            <li>
+              <a href="{{ p.html_url }}"
+                 target="_blank"
+                 class="flex items-center justify-between gap-3 rounded-lg px-3 py-2 bg-black/30 hover:bg-black/50 transition">
+                <span class="truncate">
+                  <span class="text-white/40 mr-2">#{{ p.number }}</span>
+                  {{ p.title }}
+                </span>
+                <span class="text-xs text-white/40">PR</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="text-sm text-white/40 italic">
+            No open pull requests
+          </div>
+          {% endif %}
+        </div>
+
+      </article>
+      {% endfor %}
+    </div>
+
+    <!-- RIGHT: Fun Console -->
+    <aside class="hidden lg:flex flex-col gap-4 sticky top-24 h-fit">
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
+        <h3 class="font-semibold text-lg">Very Important Stuff</h3>
+
+        <button onclick="startDisco()"
+          class="w-full px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+          Disco Mode 
+        </button>
+
+        <button onclick="deployConfetti()"
+          class="w-full px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition">
+          Deploy Confetti 
+        </button>
+
+
+        <div class="pt-2 text-xs text-white/40">
+          Tip: ↑ ↑ ↓ ↓ ← → ← → B A
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</section>
+
+<!-- Fun + Konami Scripts -->
+<script>
+/* ───── Konami Code ───── */
+const KONAMI = [
+  "ArrowUp","ArrowUp","ArrowDown","ArrowDown",
+  "ArrowLeft","ArrowRight","ArrowLeft","ArrowRight",
+  "b","a"
+];
+let buffer = [];
+
+window.addEventListener("keydown", e => {
+  buffer.push(e.key);
+  buffer = buffer.slice(-KONAMI.length);
+  if (KONAMI.every((k,i) => k === buffer[i])) {
+    document.body.classList.add("konami");
+    alert("Why did Santa's helper see the doctor? Because he had a low *elf* esteem!");
+    buffer = [];
+  }
+});
+
+/* ───── Disco Mode ───── */
+let disco = null;
+function startDisco() {
+  if (disco) {
+    clearInterval(disco);
+    disco = null;
+    document.documentElement.style.removeProperty('--bt-accent');
+    return;
+  }
+  disco = setInterval(() => {
+    document.documentElement.style.setProperty(
+      '--bt-accent',
+      `hsl(${Math.random()*360},90%,60%)`
+    );
+  }, 400);
+}
+
+/* ───── Confetti ───── */
+function deployConfetti() {
+  for (let i=0;i<120;i++){
+    const c=document.createElement("div");
+    Object.assign(c.style,{
+      position:"fixed",
+      left:Math.random()*100+"vw",
+      top:"-10px",
+      width:"8px",
+      height:"8px",
+      background:`hsl(${Math.random()*360},90%,60%)`,
+      opacity:Math.random(),
+      zIndex:9999,
+      transition:"transform 2.5s, opacity 2.5s"
+    });
+    document.body.appendChild(c);
+    requestAnimationFrame(()=>{
+      c.style.transform=`translateY(110vh) rotate(${Math.random()*720}deg)`;
+      c.style.opacity=0;
+    });
+    setTimeout(()=>c.remove(),2500);
+  }
+}
+
+/* ───── Fake Discord Ping ───── */
+function discordPing(){
+  ["📡 Pinging Discord…","🟢 Webhook alive","⚡ BuffTEKS signal strong"]
+    .forEach((m,i)=>setTimeout(()=>console.log(m),i*500));
+}
+</script>
+
+<style>
+body.konami {
+  animation: hue 3s linear infinite;
+}
+@keyframes hue {
+  from { filter: hue-rotate(0deg); }
+  to   { filter: hue-rotate(360deg); }
+}
+</style>
+
+{% endblock %}
+
