@@ -22,7 +22,7 @@ ROOT = Path(__file__).parent
 load_dotenv(ROOT / ".env")
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.secret_key = os.environ.get("APP_SECRET_KEY", "dev")
+app.secret_key = os.environ.get("APP_SECRET_KEY")
 
 csrf = CSRFProtect(app)
 limiter = Limiter(get_remote_address, app=app)
